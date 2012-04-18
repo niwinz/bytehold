@@ -8,10 +8,11 @@ setup(
     version = "{v[0]}.{v[1]}".format(v=version),
     description = "Simple backup tool, which helps not to repeat scripts.",
     author = "Andrei Antoukh",
-    author_emaul = "niwi@niwi.be",
+    author_email = "niwi@niwi.be",
     url = "https://github.com/niwibe/bytehold",
     py_modules = ["bytehold"],
     scripts = ['bh'],
+    license = "BSD",
     classifiers = [
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
