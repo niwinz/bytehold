@@ -44,6 +44,26 @@ In general, the script only needs to know that data store and how to access that
     [filesystem:test]
     paths=/home/niwi/pyrasite
 
+Usage examples:
+---------------
+
+This is a example using ini configuration file::
+    
+    [niwi@vaio.niwi.be][~/devel/bytehold]% ./bh -c backup.ini -v
+    Postgresql - starting postgresql handler (test).
+    Postgresql - exec: pg_dump --host localhost --port 5432 -U niwi test
+    Postgresql - compressing dump file.
+    Postgresql - exec: /usr/bin/xz -z4 /tmp/tmprn01tf.sql
+    Postgresql - exec: /usr/bin/scp /tmp/tmprn01tf.sql.xz niwi@localhost:/tmp/mormont/mormont.2012-04-18_2310.postgresql.sql.xz
+    FileSystem - starting filesystem backup handler (test).
+    FileSystem - exec: rsync -avr /home/niwi/pyrasite niwi@localhost:/tmp/mormont
+
+And, this is a example using declarative python module::
+    
+    [niwi@vaio.niwi.be][~/devel/bytehold]% ./bh -p backup.py.example -v
+    FileSystem - starting filesystem backup handler (My Temporal directory).
+    FileSystem - exec: rsync -avr /home/niwi/tmp niwi@localhost:/tmp/mormont
+
 
 How to install
 --------------

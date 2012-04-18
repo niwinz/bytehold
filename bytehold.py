@@ -345,6 +345,8 @@ class BaseBackup(object):
 
 
 class BackupIni(BaseBackup):
+    handler_list = [FileSystem, Postgresql]
+
     def handlers(self): 
         config = configparser.ConfigParser()
         config_file_path = absolute_path(self.args.configfile)
@@ -360,7 +362,7 @@ class BackupIni(BaseBackup):
             if section == 'global':
                 continue
             
-            for handler in self.handlers:
+            for handler in self.handler_list:
                 if section.startswith(handler.prefix):
                     try:
                         prefix, name = section.split(":",1)
@@ -375,7 +377,7 @@ class BackupIni(BaseBackup):
 
 class BackupDeclarativePython(BaseBackup):
     def handlers(self):
-        config_file_path = absolute_path(args.python_config)
+        config_file_path = absolute_path(self.args.python_config)
         config_file_path = normalized_configfile_path(config_file_path)
         
         parsed = runpy.run_path(config_file_path)
