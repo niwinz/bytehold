@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from distutils.core import setup
+#from distutils.core import setup
+from setuptools import setup, find_packages
 from bytehold import __version__ as version
 
 setup(

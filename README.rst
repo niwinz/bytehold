@@ -68,4 +68,4 @@ And, this is a example using declarative python module::
 How to install
 --------------
 
-Yo can pull the git repo and execute ``python setup.py install``.
+Yo can pull the git repo and execute ``python setup.py install`` or ``easy_install-3.2 bytehold``.
