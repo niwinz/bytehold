@@ -1,0 +1,14 @@
+[global]
+name=mormont
+compress_cmd=/usr/bin/xz -z4
+remote_host=niwi@localhost
+remote_path=/tmp/
+
+[postgresql:test]
+host=localhost
+port=5432
+user=niwi
+dbname=test
+
+[filesystem:test]
+paths=/home/niwi/pyrasite

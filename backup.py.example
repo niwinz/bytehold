@@ -1,0 +1,6 @@
+# -*- coding: utf-8 -*-
+
+from kaleidos_backuplib import FileSystem, Postgresql, Environment
+
+Environment(name="mormont", remote_host="niwi@localhost", remote_path="/tmp/")
+FileSystem(name="My Temporal directory", paths=['/home/niwi/tmp'])

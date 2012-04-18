@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import logging
+
+from bytehold import Main
+
+if __name__ == '__main__':
+    logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', dest='configfile', action="store")
+    parser.add_argument('-p', '--python-config', dest='python_config', action="store")
+    parser.add_argument('--verbose', '-v', action='count')
+    parser.add_argument('--version', action="store_true", dest="version", default=False)
+
+    args = parser.parse_args()
+    
+    try:
+        main = Main(parser, args)
+        main.init()
+    except KeyboardInterrupt:
+        pass
