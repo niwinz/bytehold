@@ -2,7 +2,7 @@
 Bytehold
 ========
 
-Simple backup tool, which helps not to repeat scripts.
+Simple backup tool written in python3, which helps not to repeat scripts.
 
 Is based on handlers, and is very simple to extend. Creating a new handler and use it. Also, there are 2 sets of settings to use:
 
