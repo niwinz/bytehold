@@ -21,7 +21,8 @@ In general, the script only needs to know that data store and how to access that
 
 **Sample python declarative configuration**::
     
-    from bytehold import Environment, Filesystem
+    from bytehold import Environment
+    from bytehold.handlers import Filesystem
 
     Environment(name="mormont", remote_host="niwi@localhost", remote_path="/tmp/")
     FileSystem(name="My Temporal directory", paths=['/home/niwi/tmp'])
