@@ -11,7 +11,7 @@ setup(
     author = "Andrei Antoukh",
     author_email = "niwi@niwi.be",
     url = "https://github.com/niwibe/bytehold",
-    py_modules = ["bytehold"],
+    packages = find_packages(),
     scripts = ['bh'],
     license = "BSD",
     classifiers = [

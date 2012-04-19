@@ -2,3 +2,4 @@
 dist
 build
 bytehold.egg-info
+*.swp
