@@ -43,14 +43,15 @@ class BaseHandler(object):
 
     _scheduled_for_delete = []
 
-    def __init__(self, name='anonymous', **kwargs):
+    def __init__(self, name='anonymous', auto_register=True, **kwargs):
         self.name = name
         self.config = kwargs
         self.env = Environment()
         self.validate_config()
 
-        manager = HandlerManager()
-        manager.register(self)
+        if auto_register:
+            manager = HandlerManager()
+            manager.register(self)
 
     def __del__(self):
         """
