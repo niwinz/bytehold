@@ -7,10 +7,20 @@ import logging
 import datetime
 
 from subprocess import Popen, PIPE
+from contextlib import contextmanager
 
 from ..env import Environment
 from ..exceptions import FileDoesNotExists
 from ..exceptions import InvalidConfiguration
+
+
+@contextmanager
+def chdircm(new_path):
+    '''chdir context manager'''
+    saved_path = os.getcwd()
+    os.chdir(new_path)
+    yield
+    os.chdir(saved_path)
 
 class HandlerManager(object):
     instance = None
@@ -104,6 +114,20 @@ class BaseHandler(object):
         ok = self.execute(command)
         if ok:
             return True, "{0}.xz".format(path)
+        return False, path
+
+    def tar(self, tar_path, path):
+        """
+        This execute a compress comand for path.
+        """
+        command = "tar -cf {tar_path}.tar .".format(tar_path=tar_path)
+        logging.info("%s - exec: %s", self.handler_name, command)
+
+        with chdircm(path):
+            ok = self.execute(command)
+
+        if ok:
+            return True, "{0}.tar".format(tar_path)
         return False, path
 
     def print_output(self, output):
