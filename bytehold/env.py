@@ -9,7 +9,7 @@ from .exceptions import InvalidConfiguration
 COMPRESS_COMMAND = "/usr/bin/xz -z6"
 RSYNC_COMMAND = "rsync -avr"
 SCP_COMMAND = "/usr/bin/scp"
-TAR_COMMAND = "/usr/bin/tar"
+TAR_COMMAND = "/bin/tar"
 
 
 class Environment(object):

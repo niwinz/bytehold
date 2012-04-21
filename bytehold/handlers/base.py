@@ -5,6 +5,7 @@ import shlex
 import shutil
 import logging
 import datetime
+import tempfile
 
 from subprocess import Popen, PIPE
 from contextlib import contextmanager
@@ -126,8 +127,8 @@ class BaseHandler(object):
           of a tar executable. On make the backup, chdirs to this directory.
         - ``paths`` is a list or unique string indicates relative paths to ``base_path`` for
           more granular backup. You can put "*" for select al files located in ``base_path``.
-        - ``tar_path`` is a absolute path for a new created tar file. If parameter is None, 
-          the path is set to a standard temporary directory on your operating system.
+        - ``tar_name`` is a complete name of resultant tar, without extension
+
         - ``compress_format`` is a compression format for a tarball, is is None, no compression
           used. Posible values are xz, bzip2 or gzip.
 
@@ -141,15 +142,14 @@ class BaseHandler(object):
             paths="'"+"' '".join(paths)+"'"
        
         flags, ext = "cv{extra}", "tar"
-
         if compress_format is not None:
-            if flags == 'xz':
+            if compress_format == 'xz':
                 flags = flags.format(extra='J')
                 ext = "tar.xz"
-            elif flags == 'bzip2':
+            elif compress_format == 'bzip2':
                 flags = flags.format(extra='j')
                 ext = "tar.bz2"
-            elif flags == 'gzip':
+            elif compress_format == 'gzip':
                 flags = flags.format(extra='z')
                 ext = "tar.gz"
             else:
@@ -158,24 +158,24 @@ class BaseHandler(object):
         else:
             flags = flags.format(extra='')
         
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tar_path = os.path.join(tmpdir.name, "{name}.{ext}".format(name=tar_name, ext=ext))
+        tmpdir = tempfile.mkdtemp()
+        self.sched_for_delete(tmpdir)
 
-            command = "{command} -{flags} -f {tar_path} -C {base_path} {paths}".format(
-                command = self.env.command_tar(),
-                flags = flags,
-                tar_path = tar_path,
-                base_path = base_path,
-                paths = paths,
-            )
+        tar_path = os.path.join(tmpdir, "{name}.{ext}".format(name=tar_name, ext=ext))
+        command = "{command} -{flags} -f {tar_path} -C {base_path} {paths}".format(
+            command = self.env.command_tar(),
+            flags = flags,
+            tar_path = tar_path,
+            base_path = base_path,
+            paths = paths,
+        )
             
         logging.info("%s - exec: %s", self.handler_name, command)
         ok = self.execute(command)
         
-        # FIXME
         if ok:
-            return True, "{0}.{1}".format(tar_path, extension)
-        return False, path
+            return True, tar_path
+        return False, None
 
     def print_output(self, output):
         """

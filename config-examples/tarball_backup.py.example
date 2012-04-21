@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from bytehold.handlers import Tarball
+from bytehold import Environment
+
+Environment(name="mormont", remote_host="niwi@localhost", remote_path="/tmp/")
+Tarball(name="My Temporal tarball", 
+    base_path="/home/niwi", paths=["test"])

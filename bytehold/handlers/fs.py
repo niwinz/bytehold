@@ -2,6 +2,7 @@
 
 import logging
 import tempfile
+import os
 
 from .base import BaseHandler
 from ..exceptions import InvalidConfiguration
@@ -34,39 +35,36 @@ class Tarball(BaseHandler):
 
     prefix = "tarball"
 
+    def validate_config(self):
+        if "paths" not in self.config:
+            raise InvalidConfiguration("path parameter is mandatory.")
+
+        if "base_path" not in self.config:
+            self.config['base_path'] = '.'
+
+        if "compress_format" not in self.config:
+            self.config['compress_format'] = "xz"
+
     def run(self):
         logging.info("%s - starting filesystem backup handler (%s).", self.handler_name, self.name)
 
-        if "paths" not in self.config:
-            raise InvalidConfiguration()
-        if "base_path" not in self.config:
-            self.config['base_path'] = "."
-        if "compress_format" not in self.config:
-            self.config['compress_format'] = "gz"
-
         paths = self.config['paths']
+        base_path = self.config['base_path']
+        compress_format = self.config['compress_format']
 
-        with tempfile.NamedTemporaryFile(suffix="", delete=False) as f:
-            file_name = f.name
-
-        ok, file_name = self.tar(
-                file_name, paths,
-                base_path=self.config['base_path'],
-                compress_format=self.config['compress_format']
-        )
-        self.sched_for_delete(file_name)
-        if not ok:
-            logging.error("%s - failed tar.", self.handler_name)
-
-        ext = ".".join(file_name.split(".")[1:])
-
-        final_name = "{name}.{stamp}.tarball.{ext}".format(
+        final_name = "{name}.{stamp}.tarball".format(
             name = self.env.name(),
-            ext = ext,
             stamp = self.timestamp(),
         )
 
-        ok = self.scp_put(file_name, final_name)
+        ok, path  = self.tar(base_path, paths, final_name, compress_format)
+        if not ok:
+            logging.error("%s - failed tar.", self.handler_name)
+            return None
+
+        self.sched_for_delete(path)
+        final_name = os.path.basename(path)
+        ok = self.scp_put(path, final_name)
         if not ok:
             logging.error("%s - failed scp.", self.handler_name)
 
