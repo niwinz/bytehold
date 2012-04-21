@@ -9,6 +9,7 @@ from .exceptions import InvalidConfiguration
 COMPRESS_COMMAND = "/usr/bin/xz -z6"
 RSYNC_COMMAND = "rsync -avr"
 SCP_COMMAND = "/usr/bin/scp"
+TAR_COMMAND = "/usr/bin/tar"
 
 
 class Environment(object):
@@ -58,5 +59,12 @@ class Environment(object):
             return SCP_COMMAND
         return self.config['scp_cmd']
 
+    def command_tar(self):  
+        if "tar_cmd" not in self.config:
+            return TAR_COMMAND
+        return self.config['tar_cmd']
+
     def extend(self, **kwargs):
         self.config.update(kwargs)
+
+
