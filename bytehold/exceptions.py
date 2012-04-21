@@ -6,3 +6,5 @@ class FileDoesNotExists(Exception):
 class InvalidConfiguration(Exception):
     pass
 
+class InvalidCompressFormat(Exception):
+    pass
