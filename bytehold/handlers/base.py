@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from ..env import Environment
 from ..exceptions import FileDoesNotExists
 from ..exceptions import InvalidConfiguration
+from ..exceptions import InvalidCompressFormat
 
 
 @contextmanager
@@ -117,18 +118,47 @@ class BaseHandler(object):
             return True, "{0}.xz".format(path)
         return False, path
 
-    def tar(self, tar_path, path):
+    def tar(self, tar_path, paths, base_path="/tmp", compress_format="none"):
         """
         This execute a compress comand for path.
         """
-        command = "tar -cf {tar_path}.tar .".format(tar_path=tar_path)
+        if isinstance(paths, str) and paths=="*":
+            paths = '*'
+        elif isinstance(paths, str):
+            paths="'"+paths+"'"
+        elif isinstance(paths, list) or isinstance(paths, tuple):
+            paths="'"+"' '".join(paths)+"'"
+       
+        compress_options = "cf"
+
+        if compress_format == "none":
+            extension = "tar"
+        elif compress_format == "xz":
+            compress_options = 'J'+compress_options
+            extension = "tar.xz"
+        elif compress_format == "bz2":
+            compress_options = 'j'+compress_options
+            extension = "tar.bz2"
+        elif compress_format == "gz":
+            compress_options = 'z'+compress_options
+            extension = "tar.gz"
+        else:
+            raise InvalidCompressFormat(compress_format)
+
+        command = "tar -{compress_options} {tar_path}.{extension} {paths}".format(
+                tar_path=tar_path,
+                compress_options=compress_options,
+                extension=extension,
+                paths=paths
+        )
+
         logging.info("%s - exec: %s", self.handler_name, command)
 
-        with chdircm(path):
+        with chdircm(base_path):
             ok = self.execute(command)
 
         if ok:
-            return True, "{0}.tar".format(tar_path)
+            return True, "{0}.{1}".format(tar_path, extension)
         return False, path
 
     def print_output(self, output):

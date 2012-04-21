@@ -12,7 +12,7 @@ from .util import absolute_path
 from .env import Environment
 
 # temporary handlers import
-from .handlers import FileSystem, Postgresql, MySQL
+from .handlers import FileSystem, Postgresql, MySQL, Tarball
 
 class BaseBackup(object):
     def __init__(self, args):
