@@ -118,7 +118,7 @@ class BaseHandler(object):
             return True, "{0}.xz".format(path)
         return False, path
 
-    def tar(self, tar_path, paths, base_path="/tmp", compress_format="none"):
+    def tar(self, base_path, paths, tar_name, compress_format=None):
         """
         This execute a compress comand for path.
         
@@ -158,17 +158,17 @@ class BaseHandler(object):
         else:
             flags = flags.format(extra='')
         
-        if tar_path is None:
-            pass
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tar_path = os.path.join(tmpdir.name, "{name}.{ext}".format(name=tar_name, ext=ext))
 
-        command = "{command} -{flags} -f {tar_path} -C {base_path} {paths}".format(
-            command = self.env.command_tar(),
-            flags = flags,
-            tar_path = tar_path,
-            base_path = base_path,
-            paths = paths,
-        )
-
+            command = "{command} -{flags} -f {tar_path} -C {base_path} {paths}".format(
+                command = self.env.command_tar(),
+                flags = flags,
+                tar_path = tar_path,
+                base_path = base_path,
+                paths = paths,
+            )
+            
         logging.info("%s - exec: %s", self.handler_name, command)
         ok = self.execute(command)
         
