@@ -24,12 +24,15 @@ def lazy(fn):
 
 
 @lazy
-def resolve_absolute_path(name, returncodeok=0):
+def resolve_absolute_path(name, params="", returncodeok=0):
     proc = Popen(['which', name], stdout=PIPE, stderr=PIPE)
     return_code = p.wait()
 
-    if return_code == returncodeok:
-        out, err = proc.communicate()
-        return out.strip().decode('utf-8')
-    return ''
-
+    if return_code != returncodeok:
+        return ''
+    
+    out, err = proc.communicate()
+    cmd = out.strip().decode('utf-8')
+    if params:
+        return "{cmd} {params}".format(cmd=cmd, params=params)
+    return cmd
