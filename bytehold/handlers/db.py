@@ -6,22 +6,38 @@ import tempfile
 
 from .base import BaseHandler
 from ..exceptions import InvalidConfiguration
+from ..utils import resolve_absolute_path
 
 class Postgresql(BaseHandler):
     """
     This is a handler for postgresql backups.
+
+    This accepts this parameters:
+
+    * `dbname`set database name.
+    * `host`: set database host.
+    * `port`: set database port.
+    * `compress`: set '1' if need compress pgdump output.
+    * `pg_dump_command`: set a full path for a pg_dump command.
+
+    By default, pg_dump command is resolved with `which` system command.
+        
     """
 
     prefix = "postgresql"
-    pgdump_command_template = ("pg_dump --host {host} --port {port} "
-                              "-U {user} {dbname}")
+    pgdump_command = resolve_absolute_path('pg_dump')
+    pgdump_command_template = ("{pg_dump_command} --host {host} --port {port} "
+                               "-U {user} {dbname}")
+
+    default_port = 5432
+    default_host = 'localhost'
 
     def validate_config(self):
         if "port" not in self.config:
-            self.config['port'] = '5432'
+            self.config['port'] = self.default_port
         
         if "host" not in self.config:
-            self.config['host'] = 'localhost'
+            self.config['host'] = self.default_host
 
         if "user" not in self.config:
             self.config['user'] = os.getlogin()
@@ -31,6 +47,12 @@ class Postgresql(BaseHandler):
 
         if "compress" not in self.config:
             self.config["compress"] = "1"
+
+        if "pg_dump_command" not in self.config:
+            if callable(self.pgdump_command):
+                self.config['pg_dump_command'] = self.pg_dump_command()
+            else:   
+                self.config['pg_dump_command'] = self.pg_dump_command
 
     def dump_db(self):
         """
@@ -86,20 +108,28 @@ class MySQL(BaseHandler):
     """
 
     prefix = "mysql"
-    mysqldump_command_template = ("mysqldump --host={host} --port={port}"
-                              " --user={user} --password={password} {dbname}")
-    hotcopy_command_template = ("mysqlhotcopy --host={host} --port={port}"
-                              " --user={user} {dbname} {_tmp_dir}")
-    hotcopy_withpw_command_template = ("mysqlhotcopy --host={host} "
-                              " --port={port} --user={user}"
-                              "--password={password} {dbname} {_tmp_dir}")
+
+    mysqldump_command = resolve_absolute_path('mysqldump')
+    mysqldump_command_template = ("{mysqldump_command} --host={host} --port={port} "
+                                  "--user={user} --password={password} {dbname}")
+    
+    hotcopy_command = resolve_absolute_path('mysqlhotcopy')
+    hotcopy_command_template = ("{hotcopy_command} --host={host} --port={port} "
+                                "--user={user} {dbname} {_tmp_dir}")
+
+    hotcopy_withpw_command_template = ("{hotcopy_command} --host={host} "
+                                       "--port={port} --user={user} "
+                                       "--password={password} {dbname} {_tmp_dir}")
+
+    default_host = 'localhost'
+    default_port = '3306'
 
     def validate_config(self):
         if "port" not in self.config:
-            self.config['port'] = '3306'
+            self.config['port'] = self.default_port
         
         if "host" not in self.config:
-            self.config['host'] = 'localhost'
+            self.config['host'] = self.default_host
 
         if "user" not in self.config:
             self.config['user'] = os.getlogin()
@@ -118,6 +148,19 @@ class MySQL(BaseHandler):
 
         if "compress" not in self.config:
             self.config["compress"] = "1"
+
+        if "hotcopy_command" not in self.config:
+            if callable(self.hotcopy_command):
+                self.config["hotcopy_command"] = self.hotcopy_command()
+            else:
+                self.config["hotcopy_command"] = self.hotcopy_command
+
+        if "mysqldump_command" not in self.config:
+            if callable(self.mysqldump_command):
+                self.config['mysqldump_command'] = self.mysqldump_command()
+            else:
+                self.config['mysqldump_command'] = self.mysqldump_command
+
 
     def binary_backup(self):
         """

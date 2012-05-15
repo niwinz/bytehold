@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from subprocess import Popem, PIPE
 from .exceptions import FileDoesNotExists
 
 def normalized_configfile_path(path):
@@ -12,4 +13,23 @@ def normalized_configfile_path(path):
 
 def absolute_path(path):
     return os.path.join(os.path.abspath("."), path)
+
+
+def lazy(fn):
+    def new(*args, **kwargs):
+        ret = lambda *a, **k: fn(*args)
+        ret.__name__ = "lazy-" + fn.__name__
+        return ret
+    return new
+
+
+@lazy
+def resolve_absolute_path(name, returncodeok=0):
+    proc = Popen(['which', name], stdout=PIPE, stderr=PIPE)
+    return_code = p.wait()
+
+    if return_code == returncodeok:
+        out, err = proc.communicate()
+        return out.strip().decode('utf-8')
+    return ''
 
