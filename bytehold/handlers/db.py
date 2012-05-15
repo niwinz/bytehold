@@ -6,7 +6,7 @@ import tempfile
 
 from .base import BaseHandler
 from ..exceptions import InvalidConfiguration
-from ..utils import resolve_absolute_path
+from ..util import resolve_absolute_path
 
 class PostgreSQL(BaseHandler):
     """

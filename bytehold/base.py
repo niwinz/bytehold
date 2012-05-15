@@ -12,7 +12,7 @@ from .util import absolute_path
 from .env import Environment
 
 # temporary handlers import
-from .handlers import FileSystem, Postgresql, MySQL, Tarball
+#from .handlers import FileSystem, Postgresql, MySQL, Tarball
 
 class BaseBackup(object):
     def __init__(self, args):
@@ -27,7 +27,7 @@ class BaseBackup(object):
 
 
 class BackupIni(BaseBackup):
-    handler_list = [FileSystem, Postgresql]
+    handler_list = []
 
     def handlers(self): 
         config = configparser.ConfigParser()
