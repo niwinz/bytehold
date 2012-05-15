@@ -48,8 +48,11 @@ class PostgreSQL(BaseHandler):
         if "compress" not in self.config:
             self.config["compress"] = True
         else:
-            conf_compress = self.config['compress'].strip()
-            if conf_compress in  ('1', 'true'):
+            conf_compress = self.config['compress']
+            if isinstance(conf_compress, bool):
+                return conf_compress
+
+            if conf_compress.strip() in  ('1', 'true'):
                 self.config['compress'] = True
             else:
                 self.config['compress'] = False
