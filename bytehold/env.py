@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import os, socket
 
 from .exceptions import FileDoesNotExists
 from .exceptions import InvalidConfiguration
@@ -27,7 +27,7 @@ class Environment(object):
 
     def name(self):
         if "name" not in self.config:
-            raise InvalidConfiguration()
+            self.config['name'] = socket.gethostname()
         return self.config['name']
 
     def remote_host(self):

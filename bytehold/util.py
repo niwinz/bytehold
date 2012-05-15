@@ -26,7 +26,7 @@ def lazy(fn):
 @lazy
 def resolve_absolute_path(name, params="", returncodeok=0):
     proc = Popen(['which', name], stdout=PIPE, stderr=PIPE)
-    return_code = p.wait()
+    return_code = proc.wait()
 
     if return_code != returncodeok:
         return ''

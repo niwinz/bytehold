@@ -25,12 +25,12 @@ class PostgreSQL(BaseHandler):
     """
 
     prefix = "postgresql"
-    pgdump_command = resolve_absolute_path('pg_dump')
-    pgdump_command_template = ("{pg_dump_command} --host {host} --port {port} "
+    pg_dump_command = resolve_absolute_path('pg_dump')
+    pg_dump_command_template = ("{pg_dump_command} --host {host} --port {port} "
                                "-U {user} {dbname}")
 
     default_port = 5432
-    default_host = 'localhost'
+    default_host = '/tmp' # used for unix socket trusted connections.
 
     def validate_config(self):
         if "port" not in self.config:
@@ -50,15 +50,14 @@ class PostgreSQL(BaseHandler):
         else:
             conf_compress = self.config['compress']
             if isinstance(conf_compress, bool):
-                return conf_compress
-
-            if conf_compress.strip() in  ('1', 'true'):
+                pass
+            elif conf_compress.strip() in  ('1', 'true'):
                 self.config['compress'] = True
             else:
                 self.config['compress'] = False
 
         if "pg_dump_command" not in self.config:
-            if callable(self.pgdump_command):
+            if callable(self.pg_dump_command):
                 self.config['pg_dump_command'] = self.pg_dump_command()
             else:   
                 self.config['pg_dump_command'] = self.pg_dump_command
@@ -68,7 +67,7 @@ class PostgreSQL(BaseHandler):
         Runs pg_dump and return tuple when the first element is boolen and second
         the filename.
         """
-        command = self.pgdump_command_template.format(**self.config)
+        command = self.pg_dump_command_template.format(**self.config)
         logging.info("%s - exec: %s", self.handler_name, command)
 
         with tempfile.NamedTemporaryFile(suffix=".sql", delete=False) as f:
