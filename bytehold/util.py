@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from subprocess import Popem, PIPE
+from subprocess import Popen, PIPE
 from .exceptions import FileDoesNotExists
 
 def normalized_configfile_path(path):
