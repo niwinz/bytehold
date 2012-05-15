@@ -8,7 +8,7 @@ from .base import BaseHandler
 from ..exceptions import InvalidConfiguration
 from ..utils import resolve_absolute_path
 
-class Postgresql(BaseHandler):
+class PostgreSQL(BaseHandler):
     """
     This is a handler for postgresql backups.
 
@@ -46,7 +46,13 @@ class Postgresql(BaseHandler):
             raise InvalidConfiguration()
 
         if "compress" not in self.config:
-            self.config["compress"] = "1"
+            self.config["compress"] = True
+        else:
+            conf_compress = self.config['compress'].strip()
+            if conf_compress in  ('1', 'true'):
+                self.config['compress'] = True
+            else:
+                self.config['compress'] = False
 
         if "pg_dump_command" not in self.config:
             if callable(self.pgdump_command):
@@ -78,7 +84,7 @@ class Postgresql(BaseHandler):
             logging.error("%s - pg_dump failed.", self.handler_name)
             return
         
-        if self.config["compress"] == "1":
+        if self.config["compress"]:
             logging.info("%s - compressing dump file.", self.handler_name)
             
             ok, file_path = self.compress(file_path)
